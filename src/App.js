@@ -11,7 +11,7 @@ class Form extends React.Component {
             name: "SMN",
             trueIf: {
               value: "1",
-              operator: "eq" // "eq" | "gt" | "gte" | "lt" | "lte"
+              operator: "eq" 
             },
             label: {
               true: "",
@@ -22,7 +22,7 @@ class Form extends React.Component {
             {
               "name": "age",
               "label": "",
-              "type": "categorical", // "categorical" | "bucketized" | "continous"
+              "type": "categorical", 
               "unit": 1,
             }
           ]
@@ -44,7 +44,6 @@ class Form extends React.Component {
     if (key === "true" || key === "false") {
       values.groupingVariable.label[key] = e.target.value;
     }
-
     this.setState({ values });
   }
 
@@ -63,7 +62,6 @@ class Form extends React.Component {
       label: covariate.label,
       type: e.target.value,
     }
-    console.log(new_covariate);
     if (e.target.value === "categorical") {
       new_covariate.unit = 1;
     }
@@ -105,7 +103,7 @@ class Form extends React.Component {
             name: "SMN",
             trueIf: {
               value: "1",
-              operator: "eq" // "eq" | "gt" | "gte" | "lt" | "lte"
+              operator: "eq" 
             },
             label: {
               true: "",
@@ -116,8 +114,8 @@ class Form extends React.Component {
             {
               "name": "SMN",
               "label": "",
-              "type": "categorical", // "categorical" | "bucketized" | "continous"
-              "unit": 1, // for bucketized or continuous variable only
+              "type": "categorical", 
+              "unit": 1, 
             }
           ]
         }
