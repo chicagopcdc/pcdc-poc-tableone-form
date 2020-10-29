@@ -33,46 +33,28 @@ class Form extends React.Component {
   }
 
 
-  handleChange_g_name = (event) => {
+  handleChangeGroupingVariable = (e, key) => {
     const values = this.state.values;
-    values.groupingVariable.name = event.target.value;
+    if(key==="name"){
+      values.groupingVariable[key] = e.target.value;
+    }
+    if(key==="operator" ||key==="value" ){
+      values.groupingVariable.trueIf[key] = e.target.value;
+    }
+    if(key==="true" ||key==="false" ){
+      values.groupingVariable.label[key] = e.target.value;
+    }
+    
     this.setState({ values });
   }
-
-  handleChange_g_TrueIf = (event) => {
-    const values = this.state.values;
-    values.groupingVariable.trueIf.operator = event.target.value;
-    this.setState({ values });
-  }
-
-  handleChange_g_value = (event) => {
-    const values = this.state.values;
-    values.groupingVariable.trueIf.value = event.target.value;
-    this.setState({ values });
-  }
-
-  handleChange_g_TrueLable = (event) => {
-    const values = this.state.values;
-    values.groupingVariable.label.true = event.target.value;
-    this.setState({ values });
-  }
-
-  handleChange_g_FalseLable = (event) => {
-    const values = this.state.values;
-    values.groupingVariable.label.false = event.target.value;
-    this.setState({ values });
-  }
-
 
   addCovariate = (event) => {
     const values = this.state.values;
     values.covariates.push({
-
       "name": "age",
       "label": "",
       "type": "categorical", 
       "unit": 1, 
-
     });
     this.setState({ values });
   }
@@ -83,19 +65,13 @@ class Form extends React.Component {
     this.setState({ values });
   }
 
-  handleChange_v_name = (e, index) => {
+  handleCovariateChange = (e, index, key) => {
     const values = this.state.values;
-    values.covariates[index].name = e.target.value;
+    values.covariates[index][key] = e.target.value;
     this.setState({ values });
   }
 
-  handleChange_v_label = (e, index) => {
-    const values = this.state.values;
-    values.covariates[index].label = e.target.value;
-    this.setState({ values });
-  }
-
-  handleChange_v_type = (e, index) => {
+  handletypeChange = (e, index, key) => {
     const values = this.state.values;
     const covariate = values.covariates[index];
     const new_covariate = {
@@ -119,11 +95,6 @@ class Form extends React.Component {
     this.setState({ values });
   }
 
-  handleChange_v_unit = (e, index) => {
-    const values = this.state.values;
-    values.covariates[index].unit = e.target.value;
-    this.setState({ values });
-  }
 
   handleReset = () => {
     this.setState(
@@ -143,9 +114,9 @@ class Form extends React.Component {
           },
           covariates: [
             {
-              "name": "",
+              "name": "SMN",
               "label": "",
-              "type": "", // "categorical" | "bucketized" | "continous"
+              "type": "categorical", // "categorical" | "bucketized" | "continous"
               "unit": 1, // for bucketized or continuous variable only
             }
           ]
@@ -178,7 +149,7 @@ class Form extends React.Component {
             <h2>Grouping variable</h2>
             <label >
               name:
-                  <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.name} onChange={this.handleChange_g_name.bind(this)}>
+                  <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.name} onChange={e => (this.handleChangeGroupingVariable(e, "name"))}>
                 <option value="SMN">SMN</option>
                 <option value="SMN2">SMN2</option>
               </select>
@@ -186,7 +157,7 @@ class Form extends React.Component {
 
             <label>
               True if...:
-                <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.trueIf.operator} onChange={this.handleChange_g_TrueIf.bind(this)}>
+                <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.trueIf.operator} onChange={e => (this.handleChangeGroupingVariable(e, "operator"))}>
                 <option value="eq">eq</option>
                 <option value="gt">gt</option>
                 <option value="gte">gte</option>
@@ -197,17 +168,17 @@ class Form extends React.Component {
 
             <label>
               value:
-             <input style={{ margin: "5px 20px" }} type="number" value={this.state.values.groupingVariable.trueIf.value} onChange={this.handleChange_g_value.bind(this)} />
+             <input style={{ margin: "5px 20px" }} type="number" value={this.state.values.groupingVariable.trueIf.value} onChange={e => (this.handleChangeGroupingVariable(e, "value"))} />
             </label><br />
 
             <label>
               "True" group label:
-              <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.true} onChange={this.handleChange_g_TrueLable.bind(this)} />
+              <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.true} onChange={e => (this.handleChangeGroupingVariable(e, "true"))} />
             </label><br />
 
             <label>
               "False" group label:
-                 <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.false} onChange={this.handleChange_g_FalseLable.bind(this)} />
+                 <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.false} onChange={e => (this.handleChangeGroupingVariable(e, "false"))} />
             </label><br />
 
             <div style={{ margin: "20px 0" }}>
@@ -224,7 +195,7 @@ class Form extends React.Component {
 
                     <label>
                       Name:
-                          <select style={{ margin: "5px 20px" }} value={covariate.name} onChange={e => (this.handleChange_v_name(e, index))}>
+                          <select style={{ margin: "5px 20px" }} value={covariate.name} onChange={e => (this.handleCovariateChange(e, index, "name" ))}>
                         <option value="SMN">SMN</option>
                         <option value="SMN2">SMN2</option>
                       </select>
@@ -232,12 +203,12 @@ class Form extends React.Component {
 
                     <label>
                       Label:
-                       <input style={{ margin: "5px 20px" }} type="text" value={covariate.label} onChange={e => (this.handleChange_v_label(e, index))} />
+                       <input style={{ margin: "5px 20px" }} type="text" value={covariate.label} onChange={e => (this.handleCovariateChange(e, index, "label"))} />
                     </label><br />
 
                     <label>
                       Type:
-                             <select style={{ margin: "5px 20px" }} value={covariate.type} onChange={e => (this.handleChange_v_type(e, index))}>
+                             <select style={{ margin: "5px 20px" }} value={covariate.type} onChange={e => (this.handletypeChange(e, index , "type"))}>
                         <option value="categorical">categorical</option>
                         <option value="bucketized">bucketized</option>
                         <option value="continous">continous</option>
@@ -246,7 +217,7 @@ class Form extends React.Component {
 
                     <label>
                       Unit:
-           　　　　　<input style={{ margin: "5px 20px" }} type="number" value={covariate.unit} onChange={e => (this.handleChange_v_unit(e, index))} />
+           　　　　　<input style={{ margin: "5px 20px" }} type="number" value={covariate.unit} onChange={e => (this.handleCovariateChange(e, index, "unit"))} />
                     </label><br />
 　　　　　　　　　　
 
