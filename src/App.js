@@ -20,9 +20,9 @@ class Form extends React.Component {
           },
           covariates: [
             {
-              "name": "age",
+              "name": "AGE",
               "label": "",
-              "type": "categorical", 
+              "type": "continous", 
               "unit": 1,
             }
           ]
@@ -80,9 +80,9 @@ class Form extends React.Component {
   addCovariate = (event) => {
     const values = this.state.values;
     values.covariates.push({
-      "name": "age",
+      "name": "AGE",
       "label": "",
-      "type": "categorical",
+      "type": "continous",
       "unit": 1,
     });
     this.setState({ values });
@@ -112,9 +112,9 @@ class Form extends React.Component {
           },
           covariates: [
             {
-              "name": "SMN",
+              "name": "AGE",
               "label": "",
-              "type": "categorical", 
+              "type": "continous", 
               "unit": 1, 
             }
           ]
@@ -147,22 +147,23 @@ class Form extends React.Component {
             <h2>Grouping variable</h2>
             <label >
               name:
-                  <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.name} onChange={e => (this.handleChangeGroupingVariable(e, "name"))}>
+                <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.name} onChange={e => (this.handleChangeGroupingVariable(e, "name"))}>
                 <option value="SMN">SMN</option>
-                <option value="SMN2">SMN2</option>
+                <option value="AGE">AGE</option>
+                <option value="SEX">SEX</option>
               </select>
             </label><br />
 
             <label>
               True if...:
                 <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.trueIf.operator} onChange={e => (this.handleChangeGroupingVariable(e, "operator"))}>
-                <option value="eq">eq</option>
-                <option value="gt">gt</option>
-                <option value="gte">gte</option>
-                <option value="lt">lt</option>
-                <option value="lte">lte</option>
+                <option value="eq">Equal to</option>
+                <option value="gt">Greater than</option>
+                <option value="gte">Greater than or equal to</option>
+                <option value="lt">Less than</option>
+                <option value="lte">Less than or equal to</option>
               </select>
-            </label>
+            </label><br />
 
             <label>
               value:
@@ -178,11 +179,12 @@ class Form extends React.Component {
               "False" group label:
                  <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.false} onChange={e => (this.handleChangeGroupingVariable(e, "false"))} />
             </label><br />
-
+            
+            
             <div style={{ margin: "20px 0" }}>
               <h2 style={{ display: "inline" }}>Covariate</h2>   <button style={{ float: "right" }} onClick={this.addCovariate.bind(this)}>Add variable</button>
             </div>
-
+            
             {
               this.state.values.covariates.map((covariate, index) => {
                 return (
@@ -195,7 +197,8 @@ class Form extends React.Component {
                       Name:
                           <select style={{ margin: "5px 20px" }} value={covariate.name} onChange={e => (this.handleCovariateChange(e, index, "name"))}>
                         <option value="SMN">SMN</option>
-                        <option value="SMN2">SMN2</option>
+                        <option value="AGE">AGE</option>
+                        <option value="SEX">SEX</option>
                       </select>
                     </label>　<br />
 
@@ -207,9 +210,9 @@ class Form extends React.Component {
                     <label>
                       Type:
                              <select style={{ margin: "5px 20px" }} value={covariate.type} onChange={e => (this.handletypeChange(e, index, "type"))}>
-                        <option value="categorical">categorical</option>
-                        <option value="bucketized">bucketized</option>
-                        <option value="continous">continous</option>
+                        <option value="categorical">Categorical</option>
+                        <option value="bucketized">Bucketized</option>
+                        <option value="continous">Continous</option>
                       </select>
                     </label>　<br />
 
