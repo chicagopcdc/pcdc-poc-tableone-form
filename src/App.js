@@ -1,37 +1,37 @@
 import React from 'react'
+import ReactDOM from 'react-dom';
+import './App.css';
 
 class Form extends React.Component {
   constructor(props) {
     super(props);
-    this.state = (
+    this.initalState= {
+      values:
       {
-        values:
-        {
-          groupingVariable: {
-            name: "SMN",
-            trueIf: {
-              value: "1",
-              operator: "eq" 
-            },
-            label: {
-              true: "",
-              false: ""
-            }
+        groupingVariable: {
+          name: "SMN",
+          trueIf: {
+            value: "1",
+            operator: "eq" 
           },
-          covariates: [
-            {
-              "name": "AGE",
-              "label": "",
-              "type": "continous", 
-              "unit": 1,
-            }
-          ]
-        }
+          label: {
+            true: "",
+            false: ""
+          }
+        },
+        covariates: [
+          {
+            "name": "AGE",
+            "label": "",
+            "type": "continous", 
+            "unit": 1,
+          }
+        ]
       }
-    );
-
+    }
+    this.state = this.initalState;
   }
-
+    
 
   handleChangeGroupingVariable = (e, key) => {
     const values = this.state.values;
@@ -134,20 +134,14 @@ class Form extends React.Component {
 
     return (
 
-      <div
-        style={{
-          fontFamily: 'sans-serif',
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{ margin: '0 1rem', padding: '0px 30px 20px 30px ', border: '2px solid #777' }}>
+      <div className="div-container"  >
+        <div className="div-form" >
 
           <form id="myForm" onSubmit={this.handleSubmit.bind(this)}>
             <h2>Grouping variable</h2>
             <label >
               name:
-                <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.name} onChange={e => (this.handleChangeGroupingVariable(e, "name"))}>
+                <select  value={this.state.values.groupingVariable.name} onChange={e => (this.handleChangeGroupingVariable(e, "name"))}>
                 <option value="SMN">SMN</option>
                 <option value="AGE">AGE</option>
                 <option value="SEX">SEX</option>
@@ -156,7 +150,7 @@ class Form extends React.Component {
 
             <label>
               True if...:
-                <select style={{ margin: "5px 20px" }} value={this.state.values.groupingVariable.trueIf.operator} onChange={e => (this.handleChangeGroupingVariable(e, "operator"))}>
+                <select value={this.state.values.groupingVariable.trueIf.operator} onChange={e => (this.handleChangeGroupingVariable(e, "operator"))}>
                 <option value="eq">Equal to</option>
                 <option value="gt">Greater than</option>
                 <option value="gte">Greater than or equal to</option>
@@ -167,17 +161,17 @@ class Form extends React.Component {
 
             <label>
               value:
-             <input style={{ margin: "5px 20px" }} type="number" value={this.state.values.groupingVariable.trueIf.value} onChange={e => (this.handleChangeGroupingVariable(e, "value"))} />
+             <input  type="number" value={this.state.values.groupingVariable.trueIf.value} onChange={e => (this.handleChangeGroupingVariable(e, "value"))} />
             </label><br />
 
             <label>
               "True" group label:
-              <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.true} onChange={e => (this.handleChangeGroupingVariable(e, "true"))} />
+              <input  type="text" value={this.state.values.groupingVariable.label.true} onChange={e => (this.handleChangeGroupingVariable(e, "true"))} />
             </label><br />
 
             <label>
               "False" group label:
-                 <input style={{ margin: "5px 20px" }} type="text" value={this.state.values.groupingVariable.label.false} onChange={e => (this.handleChangeGroupingVariable(e, "false"))} />
+                 <input  type="text" value={this.state.values.groupingVariable.label.false} onChange={e => (this.handleChangeGroupingVariable(e, "false"))} />
             </label><br />
             
             
@@ -195,7 +189,7 @@ class Form extends React.Component {
 
                     <label>
                       Name:
-                          <select style={{ margin: "5px 20px" }} value={covariate.name} onChange={e => (this.handleCovariateChange(e, index, "name"))}>
+                          <select  value={covariate.name} onChange={e => (this.handleCovariateChange(e, index, "name"))}>
                         <option value="SMN">SMN</option>
                         <option value="AGE">AGE</option>
                         <option value="SEX">SEX</option>
@@ -204,12 +198,12 @@ class Form extends React.Component {
 
                     <label>
                       Label:
-                       <input style={{ margin: "5px 20px" }} type="text" value={covariate.label} onChange={e => (this.handleCovariateChange(e, index, "label"))} />
+                       <input  type="text" value={covariate.label} onChange={e => (this.handleCovariateChange(e, index, "label"))} />
                     </label><br />
 
                     <label>
                       Type:
-                             <select style={{ margin: "5px 20px" }} value={covariate.type} onChange={e => (this.handletypeChange(e, index, "type"))}>
+                             <select  value={covariate.type} onChange={e => (this.handletypeChange(e, index, "type"))}>
                         <option value="categorical">Categorical</option>
                         <option value="bucketized">Bucketized</option>
                         <option value="continous">Continous</option>
@@ -220,7 +214,7 @@ class Form extends React.Component {
                       <>
                         <label>
                           Unit:
-           　　　　　<input style={{ margin: "5px 20px" }} type="number" value={covariate.unit} onChange={e => (this.handleCovariateChange(e, index, "unit"))} />
+           　　　　　<input  type="number" value={covariate.unit} onChange={e => (this.handleCovariateChange(e, index, "unit"))} />
                         </label><br />
                       </>
                     }
@@ -229,7 +223,7 @@ class Form extends React.Component {
                       <>
                         <label>
                           Cutoffs:
-           　　　　　<input style={{ margin: "5px 20px" }} type="number" value={covariate.cutoffs} onChange={e => (this.handleCovariateChange(e, index, "cutoffs"))} />
+           　　　　　<input  type="number" value={covariate.cutoffs} onChange={e => (this.handleCovariateChange(e, index, "cutoffs"))} />
                         </label><br />
                       </>
                     }
@@ -238,7 +232,7 @@ class Form extends React.Component {
                       <>
                         <label>
                           Values:
-           　　　　　<input style={{ margin: "5px 20px" }} type="number" value={covariate.values} onChange={e => (this.handleCovariateChange(e, index, "values"))} />
+           　　　　　<input  type="number" value={covariate.values} onChange={e => (this.handleCovariateChange(e, index, "values"))} />
                         </label><br />
                       </>
                     }
@@ -250,11 +244,11 @@ class Form extends React.Component {
 
               })
             }
-            <div style={{ margin: "5px 20px", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <input style={{ width: "200px", height: "40px", backgroundColor: 'white', margin: '5px' }} type="button" onClick={this.handleReset.bind(this)} value="Reset" /><br />
+            <div className="reset">
+              <input className="input-reset"   type="button" onClick={this.handleReset.bind(this)} value="Reset" /><br />
             </div>
-            <div style={{ margin: "5px 20px", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <input style={{ width: "200px", height: "40px", backgroundColor: 'yellow', margin: '5px' }} type="submit" value="Apply" /><br />
+            <div className="submit">
+              <input className="input-submit" type="submit" value="Apply" /><br />
             </div>
           </form>
         </div>

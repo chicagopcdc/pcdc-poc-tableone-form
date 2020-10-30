@@ -1,0 +1,51 @@
+input {
+  display: inline-block;
+  margin: 5px 20px;
+  width: 200px;
+}
+
+select {
+  display: inline-block;
+  margin: 5px 20px;
+  width: 217px;
+}
+
+label {
+  margin: 5px 20px;
+  width: 200px;
+}
+
+div.reset,
+div.submit {
+  margin: 5px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-reset {
+  width: 200px;
+  height: 40px;
+  background-color: white;
+  margin: 5px;
+}
+
+.input-submit {
+  width: 200px;
+  height: 40px;
+  background-color: yellow;
+  margin: 5px;
+}
+
+.div-form {
+  width: 500px;
+  margin: 0 1rem;
+  padding: 0px 30px 20px 30px;
+  border: 2px solid #777;
+}
+
+.div-container {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+}
