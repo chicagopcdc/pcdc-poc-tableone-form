@@ -1,8 +1,29 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import Form from './Form'
 import './App.css'
 
-class Form extends React.Component {
+const variables = [
+  {
+    type: 'continuous',
+    name: 'AGE',
+    label: 'Age',
+    range: [0, 18],
+  },
+  {
+    type: 'categorical',
+    name: 'SEX',
+    label: 'Sex',
+    values: ['female', 'male'],
+  },
+  {
+    type: 'categorical',
+    name: 'SMN',
+    label: 'SMN',
+    values: [0, 1],
+  }
+]
+
+class App extends React.Component {
   constructor(props) {
     super(props)
     this.initalState = {
@@ -119,197 +140,23 @@ class Form extends React.Component {
   }
 
   handleSubmit = (event) => {
-    console.log(this.state.values)
     event.preventDefault()
+    console.log(this.state.values)
   }
 
   render() {
+    const values = this.state.values
     return (
       <div className="div-container">
         <div className="div-form">
-          <form id="myForm" onSubmit={this.handleSubmit.bind(this)}>
-            <h2>Grouping variable</h2>
-            <label>
-              name:
-              <select
-                value={this.state.values.groupingVariable.name}
-                onChange={(e) => this.handleChangeGroupingVariable(e, 'name')}
-              >
-                <option value="SMN">SMN</option>
-                <option value="AGE">AGE</option>
-                <option value="SEX">SEX</option>
-              </select>
-            </label>
-            <br />
-
-            <label>
-              True if...:
-              <select
-                value={this.state.values.groupingVariable.trueIf.operator}
-                onChange={(e) =>
-                  this.handleChangeGroupingVariable(e, 'operator')
-                }
-              >
-                <option value="eq">Equal to</option>
-                <option value="gt">Greater than</option>
-                <option value="gte">Greater than or equal to</option>
-                <option value="lt">Less than</option>
-                <option value="lte">Less than or equal to</option>
-              </select>
-            </label>
-            <br />
-
-            <label>
-              value:
-              <input
-                type="number"
-                value={this.state.values.groupingVariable.trueIf.value}
-                onChange={(e) => this.handleChangeGroupingVariable(e, 'value')}
-              />
-            </label>
-            <br />
-
-            <label>
-              "True" group label:
-              <input
-                type="text"
-                value={this.state.values.groupingVariable.label.true}
-                onChange={(e) => this.handleChangeGroupingVariable(e, 'true')}
-              />
-            </label>
-            <br />
-
-            <label>
-              "False" group label:
-              <input
-                type="text"
-                value={this.state.values.groupingVariable.label.false}
-                onChange={(e) => this.handleChangeGroupingVariable(e, 'false')}
-              />
-            </label>
-            <br />
-
-            <div style={{ margin: '20px 0' }}>
-              <h2 style={{ display: 'inline' }}>Covariate</h2>{' '}
-              <button
-                style={{ float: 'right' }}
-                onClick={this.addCovariate.bind(this)}
-              >
-                Add variable
-              </button>
-            </div>
-
-            {this.state.values.covariates.map((covariate, index) => {
-              return (
-                <div key={index}>
-                  <h4 style={{ display: 'inline' }}>variable {index + 1}</h4>{' '}
-                  <button
-                    style={{ float: 'right' }}
-                    onClick={this.removeCovariate.bind(this, index)}
-                  >
-                    Delete variable
-                  </button>{' '}
-                  <br />
-                  <label>
-                    Name:
-                    <select
-                      value={covariate.name}
-                      onChange={(e) =>
-                        this.handleCovariateChange(e, index, 'name')
-                      }
-                    >
-                      <option value="SMN">SMN</option>
-                      <option value="AGE">AGE</option>
-                      <option value="SEX">SEX</option>
-                    </select>
-                  </label>
-                  　<br />
-                  <label>
-                    Label:
-                    <input
-                      type="text"
-                      value={covariate.label}
-                      onChange={(e) =>
-                        this.handleCovariateChange(e, index, 'label')
-                      }
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Type:
-                    <select
-                      value={covariate.type}
-                      onChange={(e) => this.handletypeChange(e, index, 'type')}
-                    >
-                      <option value="categorical">Categorical</option>
-                      <option value="bucketized">Bucketized</option>
-                      <option value="continous">Continous</option>
-                    </select>
-                  </label>
-                  　<br />
-                  {covariate.unit && (
-                    <>
-                      <label>
-                        Unit: 　　　　　
-                        <input
-                          type="number"
-                          value={covariate.unit}
-                          onChange={(e) =>
-                            this.handleCovariateChange(e, index, 'unit')
-                          }
-                        />
-                      </label>
-                      <br />
-                    </>
-                  )}
-                  {covariate.cutoffs && (
-                    <>
-                      <label>
-                        Cutoffs: 　　　　　
-                        <input
-                          type="number"
-                          value={covariate.cutoffs}
-                          onChange={(e) =>
-                            this.handleCovariateChange(e, index, 'cutoffs')
-                          }
-                        />
-                      </label>
-                      <br />
-                    </>
-                  )}
-                  {covariate.values && (
-                    <>
-                      <label>
-                        Values: 　　　　　
-                        <input
-                          type="number"
-                          value={covariate.values}
-                          onChange={(e) =>
-                            this.handleCovariateChange(e, index, 'values')
-                          }
-                        />
-                      </label>
-                      <br />
-                    </>
-                  )}
-                  <br />
-                </div>
-              )
-            })}
-            <div className="reset">
-              <input
-                className="input-reset"
-                type="button"
-                onClick={this.handleReset.bind(this)}
-                value="Reset"
-              />
-              <br />
-            </div>
-            <div className="submit">
-              <input className="input-submit" type="submit" value="Apply" />
-              <br />
-            </div>
-          </form>
+          <Form values={values}   handleChangeGroupingVariable={this.handleChangeGroupingVariable}
+          handleCovariateChange={this.handleCovariateChange}
+          handletypeChange={this.handletypeChange}
+          addCovariate={this.addCovariate}
+          removeCovariate={this.removeCovariate}
+          handleReset={this.handleReset}
+          handleSubmit={this.handleSubmit}
+          />
         </div>
 
         <div style={{ margin: '0 1rem' }}>
@@ -321,4 +168,4 @@ class Form extends React.Component {
   }
 }
 
-export default Form
+export default App
