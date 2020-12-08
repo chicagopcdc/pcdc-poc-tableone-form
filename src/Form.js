@@ -1,191 +1,309 @@
 import React from 'react'
+import Covar from './Covar'
 
-export default class Form extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+function Form(prop) {
+    const operator=[
+        {key:"eq", name:"Equal to"},
+        {key:"gt", name:"Greater than"},
+        {key:"gte", name:"Greater than or equal to"},
+        {key:"lt", name:"Less than"},
+        {key:"lte", name:"Less than or equal to"}
+    ]
 
-  render() {
+
+    const covar = JSON.parse(JSON.stringify(prop.variables))
+    covar.splice(prop.gid, 1)
+
+    const validCutoffs = (e, index, range) => {
+        const obj = e.target.value.split(",").map((e) => e.trim())
+
+        if(!obj.every(function(e, i, obj) {
+            if (i) return (e > obj[i-1] && !isNaN(e) && e>=range[0] && e<=range[1])
+            else return !isNaN(e) && e>=range[0] && e<=range[1];
+        })){
+            prop.input.values.covariates[index].cutoffs=''
+            prop.updateUserInput(prop.input)
+
+            alert("Input must be numeric and in the range of ["+range[0]+" , "+range[1]+"]. If they are multiple numbers, they must be monotone increasing and separated by comma.")
+        }
+    }
+
+
+    const validGrpValue = (e, range) => {
+        const value = e.target.value
+        if(isNaN(value) || value<range[0] || value>range[1]) {
+            prop.input.values.groupingVariable.trueIf.value=''
+            prop.updateUserInput(prop.input)
+
+            alert("Input must be numeric and in the range of ["+range[0]+" , "+range[1]+"]")
+        }
+    }
+
+    const changeGrpVar = (e, key) => {
+        const value = e.target.value
+
+        if (key === 'name') {
+            const index = prop.variables.findIndex(e => e.name === value);
+
+            prop.input.values.groupingVariable.name = value
+            prop.input.values.groupingVariable.trueIf.operator='eq'
+            prop.input.values.groupingVariable.trueIf.value=''
+            prop.input.values.groupingVariable.label.true=''
+            prop.input.values.groupingVariable.label.false=''
+
+            // input.values.covariates.filter(e => e.name !== value);
+            prop.input.values.covariates=[];
+
+            prop.updateGrpIndex(index)
+        }
+
+        if (key === 'operator' || key === 'value') {
+            prop.input.values.groupingVariable.trueIf[key] = value
+        }
+        if (key === 'true' || key === 'false') {
+            prop.input.values.groupingVariable.label[key] = value
+        }
+
+        prop.updateUserInput(prop.input)
+    }
+
+    const changeCoVar = (e, index, key, kv='') => {
+        // const checked={this.state.checkedItems.get(item.name)}
+
+
+        let obj = JSON.parse(JSON.stringify(prop.input.values.covariates[index]))
+        const value = e.target.value
+
+
+        if (key === 'name') {
+            const ind = covar.findIndex(x => x.name === value);
+            obj = covar[ind]
+
+            if (obj.type==="continous"){
+                obj.unit=1
+            }
+            if (obj.type==="categorical"){
+                obj.keys=obj.values
+            }
+        }
+        if (key === 'type' || key === 'label' || key === 'unit') {
+            obj[key] = value
+            if (key === 'type' && value === 'bucketized'){
+                obj={...obj, unit:'1', keys:[], cutoffs:[]}
+            }
+            if (key === 'type' && value === 'continous'){
+                const ind = covar.findIndex(x => x.name === obj.name);
+                obj = covar[ind]
+                obj.unit=1
+            }
+        }
+
+        if (key === 'keys') {
+            if (obj.type==='categorical'){
+                obj.values.map((v,k)=>{
+                    if (v === kv) {
+                        obj.keys[k]=value
+                    }
+                })
+            }else{
+                obj.keys.map((v,k)=>{
+                    if (v === kv) {
+                        obj.keys[k]=value
+                    }
+                })
+            }
+
+        }
+
+        if (key === 'values' && e.target.type === 'checkbox') {
+            if (e.target.checked){
+                obj.values.push(value)
+                obj.keys.push(value)
+            }else{
+                obj.keys.splice(obj.values.indexOf(value), 1)
+                obj.values.splice(obj.values.indexOf(value), 1)
+            }
+        }
+
+
+        if (key === 'cutoffs') {
+            obj.cutoffs = value.split(",").map((e) => e.trim())
+            obj.keys=[]
+
+            obj.cutoffs.map((v,k)=>{
+                if (k===0){
+                    obj.keys.push(obj.range[0]+"-"+v)
+                }
+                if(k>0){
+                    obj.keys.push(obj.cutoffs[k-1]+"-"+v)
+                }
+                if(k===obj.cutoffs.length-1){
+                    obj.keys.push(v+"-"+obj.range[1])
+                }
+
+            })
+        }
+
+        prop.input.values.covariates[index]={...obj}
+
+        prop.updateUserInput(prop.input)
+    }
+
+    const deleteCoVar = (index)=>{
+        prop.input.values.covariates.splice(index, 1)
+        prop.updateUserInput(prop.input)
+    }
+
+    const addCoVar = () => {
+        const obj = covar[0]
+
+        if (obj.type==="continous"){
+            obj.unit=1
+        }
+
+        if (obj.type==="categorical"){
+            obj.keys=obj.values
+        }
+
+        prop.input.values.covariates.push(obj)
+
+        prop.updateUserInput(prop.input)
+    }
+
+
+    const submitForm = (event) => {
+        // event.preventDefault()
+        // console.log(this.state.values)
+    }
+
     return (
-      <form id="myForm" onSubmit={this.props.handleSubmit.bind(this)}>
-        <h2>Grouping variable</h2>
-        <label>
-          name:
-          <select
-            value={this.props.values.groupingVariable.name}
-            onChange={(e) => this.props.handleChangeGroupingVariable(e, 'name')}
-          >
-            <option value="SMN">SMN</option>
-            <option value="AGE">AGE</option>
-            <option value="SEX">SEX</option>
-          </select>
-        </label>
-        <br />
-
-        <label>
-          True if...:
-          <select
-            value={this.props.values.groupingVariable.trueIf.operator}
-            onChange={(e) =>
-              this.props.handleChangeGroupingVariable(e, 'operator')
-            }
-          >
-            <option value="eq">Equal to</option>
-            <option value="gt">Greater than</option>
-            <option value="gte">Greater than or equal to</option>
-            <option value="lt">Less than</option>
-            <option value="lte">Less than or equal to</option>
-          </select>
-        </label>
-        <br />
-
-        <label>
-          value:
-          <input
-            type="number"
-            value={this.props.values.groupingVariable.trueIf.value}
-            onChange={(e) =>
-              this.props.handleChangeGroupingVariable(e, 'value')
-            }
-          />
-        </label>
-        <br />
-
-        <label>
-          "True" group label:
-          <input
-            type="text"
-            value={this.props.values.groupingVariable.label.true}
-            onChange={(e) => this.props.handleChangeGroupingVariable(e, 'true')}
-          />
-        </label>
-        <br />
-
-        <label>
-          "False" group label:
-          <input
-            type="text"
-            value={this.props.values.groupingVariable.label.false}
-            onChange={(e) =>
-              this.props.handleChangeGroupingVariable(e, 'false')
-            }
-          />
-        </label>
-        <br />
-
-        <div style={{ margin: '20px 0' }}>
-          <h2 style={{ display: 'inline' }}>Covariate</h2>{' '}
-          <button
-            style={{ float: 'right' }}
-            onClick={this.props.addCovariate.bind(this)}
-          >
-            Add variable
-          </button>
-        </div>
-
-        {this.props.values.covariates.map((covariate, index) => {
-          return (
-            <div key={index}>
-              <h4 style={{ display: 'inline' }}>variable {index + 1}</h4>{' '}
-              <button
-                style={{ float: 'right' }}
-                onClick={this.props.removeCovariate.bind(this, index)}
-              >
-                Delete variable
-              </button>{' '}
-              <br />
-              <label>
-                Name:
+        <div>
+            <h2>Grouping variable</h2>
+            <label>
+                name:
                 <select
-                  value={covariate.name}
-                  onChange={(e) =>
-                    this.props.handleCovariateChange(e, index, 'name')
-                  }
+                    value={prop.variables[prop.gid].name}
+                    onChange={(e) => changeGrpVar(e, 'name')}
                 >
-                  <option value="SMN">SMN</option>
-                  <option value="AGE">AGE</option>
-                  <option value="SEX">SEX</option>
+                    {
+                        prop.allGrpIndex.map((i,k)=>{
+                            return(
+                                <option key={k.toString()} value={prop.variables[i].name}>{prop.variables[i].name}</option>
+                            )
+                        })
+                    }
                 </select>
-              </label>
-              　<br />
-              <label>
-                Label:
+            </label>
+            <label>
+                True if:
+                <select
+                    value={prop.input.values.groupingVariable.trueIf.operator}
+                    onChange={(e) =>
+                        changeGrpVar(e, 'operator')
+                    }
+                >
+                    {
+                        operator.map((e,k)=>{
+                            return(
+                                <option key={k.toString()} value={e.key} disabled={prop.variables[prop.gid].type!=="continuous" && e.key!=="eq"}>{e.name}</option>
+                            )
+                        })
+                    }
+                </select>
+            </label>
+            <label>
+                Value:
+                {prop.variables[prop.gid].type==="continuous" ?(
                 <input
-                  type="text"
-                  value={covariate.label}
-                  onChange={(e) =>
-                    this.props.handleCovariateChange(e, index, 'label')
-                  }
+                    type="text"
+                    value={prop.input.values.groupingVariable.trueIf.value}
+                    onBlur={(e)=>{validGrpValue(e,prop.variables[prop.gid].range)}}
+                    onChange={(e) =>
+                        changeGrpVar(e, 'value')
+                    }
                 />
-              </label>
-              <br />
-              <label>
-                Type:
-                <select
-                  value={covariate.type}
-                  onChange={(e) =>
-                    this.props.handleCovariateChange(e, index, 'type')
-                  }
-                >
-                  <option value="categorical">Categorical</option>
-                  <option value="continous">Continous</option>
-                </select>
-              </label>
-              　<br />
-              {covariate.unit && covariate.range && (
-                <>
-                  <label>
-                    Unit:
-                    <input
-                      type="number"
-                      value={covariate.unit}
-                      min={covariate.range[0]}
-                      max={covariate.range[1]}
-                      onChange={(e) =>
-                        this.props.handleCovariateChange(e, index, 'unit')
-                      }
-                    />
-                  </label>
-                  <br />
-                </>
-              )}
-              {covariate.unit && covariate.values && (
-                <>
-                  <label>
-                    Unit:
+                ):(
                     <select
-                      value={covariate.unit}
-                      onChange={(e) =>
-                        this.props.handleCovariateChange(e, index, 'unit')
-                      }
+                        value={prop.input.values.groupingVariable.trueIf.value}
+                        onChange={(e) =>
+                            changeGrpVar(e, 'value')
+                        }
                     >
-                      {covariate.values.map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
+                        {
+                            prop.variables[prop.gid].values.map((v, k)=>{
+                                return(
+                                    <option key={k.toString()} value={v}>{v}</option>
+                                )
+                            })
+                        }
                     </select>
-                  </label>
-                  <br />
-                </>
-              )}
+                )}
+            </label>
+            <label>
+                "True" group label:
+                <input
+                    type="text"
+                    value={prop.input.values.groupingVariable.label.true}
+                    onChange={(e) => changeGrpVar(e, 'true')}
+                />
+            </label>
+            <label>
+                "False" group label:
+                <input
+                    type="text"
+                    value={prop.input.values.groupingVariable.label.false}
+                    onChange={(e) =>
+                        changeGrpVar(e, 'false')
+                    }
+                />
+            </label>
+
+
+            <div style={{ margin: '20px 0' }}>
+                <h2 style={{ display: 'inline' }}>Covariate</h2>{' '}
+                <button
+                    className="btn btn-primary"
+                    style={{ float: 'right' }}
+                    onClick={addCoVar}
+                >
+                    Add variable
+                </button>
             </div>
-          )
-        })}
-        <div className="reset">
-          <input
-            className="input-reset"
-            type="button"
-            onClick={this.props.handleReset.bind(this)}
-            value="Reset"
-          />
-          <br />
+
+            {prop.input.values.covariates && prop.input.values.covariates.map((e, index) => {
+
+                return (
+                    <Covar
+                        {...e}
+                        gid={prop.gid}
+                        key={index.toString()}
+                        covar={covar}
+                        index={index}
+                        changeCoVar={changeCoVar}
+                        deleteCoVar={deleteCoVar}
+                        validCutoffs={validCutoffs}
+                    />
+                )
+            })}
+            <div className="reset">
+                <input
+                    className="input-reset btn btn-primary"
+                    type="button"
+                    onClick={prop.resetForm}
+                    value="Reset"
+                />
+                <br />
+            </div>
+            <div className="submit">
+                <input
+                    className="input-submit btn btn-primary"
+                    type="submit"
+                    value="Apply"
+                />
+                <br />
+            </div>
         </div>
-        <div className="submit">
-          <input className="input-submit" type="submit" value="Apply" />
-          <br />
-        </div>
-      </form>
     )
-  }
 }
+
+export default Form;

@@ -1,180 +1,108 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Form from './Form'
 import './App.css'
 
-class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.initalState = {
-      values: {
-        groupingVariable: {
-          name: 'SMN',
-          trueIf: {
-            value: '1',
-            operator: 'eq',
-          },
-          label: {
-            true: '',
-            false: '',
-          },
-        },
-        covariates: [
-          {
-            type: 'continuous',
-            name: 'AGE',
-            label: 'Age',
-            range: [0, 18],
-            unit: '1',
-          },
-          {
-            type: 'categorical',
-            name: 'SEX',
-            label: 'Sex',
-            values: ['female', 'male'],
-            unit: 'female',
-          },
-          {
-            type: 'categorical',
-            name: 'SMN',
-            label: 'SMN',
-            values: [0, 1],
-            unit: '1',
-          }
-        ],
-      },
-    }
-    this.state = this.initalState
-  }
-
-  handleChangeGroupingVariable = (e, key) => {
-    const values = this.state.values
-    if (key === 'name') {
-      values.groupingVariable[key] = e.target.value
-    }
-    if (key === 'operator' || key === 'value') {
-      values.groupingVariable.trueIf[key] = e.target.value
-    }
-    if (key === 'true' || key === 'false') {
-      values.groupingVariable.label[key] = e.target.value
-    }
-    this.setState({ values })
-  }
-
-  handleCovariateChange = (e, index, key) => {
-    const values = this.state.values
-    const target_value = e.target.value
-    values.covariates[index][key] = target_value 
-    this.setState({ values })
-  }
-
-  handletypeChange = (e, index, key) => { 
-    const values = this.state.values
-    const covariate = values.covariates[index]
-    const new_covariate = {
-      name: covariate.name,
-      label: covariate.label,
-      type: e.target.value,
-      unit: covariate.unit
-    }
-    if (e.target.value === 'categorical') {
-      new_covariate.unit = 1
-    }
-    if (e.target.value === 'continous') {
-      new_covariate.unit = 1
-    }
-
-    values.covariates[index] = new_covariate
-    this.setState({ values })
-  }
-
-  addCovariate = (event) => {
-    const values = this.state.values
-    console.log(this.state)
-    values.covariates.push({ 
-            type: 'continuous',
-            name: 'AGE',
-            label: 'Age',
-            range: [0, 18],
-            unit: '1',   
-    })
-    this.setState({ values })
-  }
-
-  removeCovariate = (index) => {
-    const values = this.state.values
-    values.covariates.splice(index, 1)
-    this.setState({ values })
-  }
-
-  handleReset = () => {
-    console.log(this.initalState)
-    this.setState({ values: {
-      groupingVariable: {
-        name: 'SMN',
-        trueIf: {
-          value: '1',
-          operator: 'eq',
-        },
-        label: {
-          true: '',
-          false: '',
-        },
-      },
-      covariates: [
-        {
-          type: 'continuous',
-          name: 'AGE',
-          label: 'Age',
-          unit: '1',
-          range: [0, 18],
-          
-        },
-        {
-          type: 'categorical',
-          name: 'SEX',
-          label: 'Sex',
-          values: ['female', 'male'],
-          unit: 'female',
-        },
-        {
-          type: 'categorical',
-          name: 'SMN',
-          label: 'SMN',
-          unit: '1',
-          values: [0, 1],
-        }
-      ],
+const variables = [
+    {
+        type: 'continuous',
+        name: 'AGE',
+        label: 'Age',
+        isGrouping: false,
+        range: [0, 18],
     },
-    })
-  }
+    {
+        type: 'categorical',
+        name: 'SEX',
+        label: 'Sex',
+        isGrouping: false,
+        values: ['female', 'male'],
+    },
+    {
+        type: 'continuous',
+        name: 'WEIGHT',
+        label: 'Weight',
+        isGrouping: true,
+        range: [60, 200]
+    },
+    {
+        type: 'categorical',
+        name: 'SMN',
+        label: 'SMN',
+        isGrouping: true,
+        values: [0, 1],
+    }
+]
 
-  handleSubmit = (event) => {
-    event.preventDefault()
-    console.log(this.state.values)
-  }
 
-  render() {
-    const values = this.state.values
+function App() {
+    const allGrpIndex = variables.filter(item => item.isGrouping === true).map(x => variables.indexOf(x))
+
+    const [grpIndex, setGrpIndex] = useState(allGrpIndex[0]);
+
+    const initialState={
+        values: {
+            groupingVariable: {
+                name: variables[grpIndex].name,
+                type: variables[grpIndex].type,
+                values: variables[grpIndex].type==="categorical" ? variables[grpIndex].values:variables[grpIndex].range,
+                trueIf: {
+                    value: variables[grpIndex].type==="categorical" ? variables[grpIndex].values[0]:'',
+                    operator: 'eq',
+                },
+                label: {
+                    true: '',
+                    false: '',
+                },
+            },
+            covariates: []
+        },
+    };
+
+    const [userInput, setUserInput] = useState(initialState);
+
+    const updateUserInput = (newInput) => {
+        setUserInput({...newInput});
+    };
+
+    const updateGrpIndex = (newGrpInex) => {
+        setGrpIndex(newGrpInex);
+    };
+
+    const resetForm = () => {
+        setUserInput(initialState)
+    }
+
+    // useEffect(() => {
+    //     console.log("useEffect")
+    //     console.log(userInput)
+    // }, [userInput]);
+
     return (
-      <div className="div-container">
-        <div className="div-form">
-          <Form  values={values}   handleChangeGroupingVariable={this.handleChangeGroupingVariable}
-          handleCovariateChange={this.handleCovariateChange}
-          handletypeChange={this.handletypeChange}
-          addCovariate={this.addCovariate}
-          removeCovariate={this.removeCovariate}
-          handleReset={this.handleReset}
-          handleSubmit={this.handleSubmit}
-          />
-        </div>
+        <div className="div-container m-3">
+            <div style={{ margin: '0 1rem' }}>
+                <h1>Input</h1>
+                <pre>{JSON.stringify(variables, null, 4)}</pre>
+            </div>
 
-        <div style={{ margin: '0 1rem' }}>
-          <h1>Current values</h1>
-          <pre>{JSON.stringify(this.state.values, null, 2)}</pre>
+            <div className="div-form">
+                <Form
+                    variables={variables}
+                    allGrpIndex={allGrpIndex}
+                    input={userInput}
+                    gid={grpIndex}
+                    resetForm={resetForm}
+                    updateUserInput={updateUserInput}
+                    updateGrpIndex={updateGrpIndex}
+                />
+            </div>
+
+            <div style={{ margin: '0 1rem' }}>
+                <h1>Output</h1>
+                <pre>{JSON.stringify(userInput, null, 4)}</pre>
+            </div>
+
         </div>
-      </div>
     )
-  }
 }
 
-export default App
+export default App;
