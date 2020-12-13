@@ -11,8 +11,10 @@ function Form(prop) {
     ]
 
 
-    const covar = JSON.parse(JSON.stringify(prop.variables))
-    covar.splice(prop.gid, 1)
+    // const covar = JSON.parse(JSON.stringify(prop.variables))
+    // covar.splice(prop.gid, 1)
+    const covar = prop.variables.filter(item => item.isGrouping === false)
+
 
     const validCutoffs = (e, index, range) => {
         const obj = e.target.value.split(",").map((e) => e.trim())
