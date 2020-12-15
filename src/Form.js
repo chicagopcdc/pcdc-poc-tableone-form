@@ -16,17 +16,21 @@ function Form(prop) {
     const covar = prop.variables.filter(item => item.isGrouping === false)
 
 
-    const validCutoffs = (e, index, range) => {
-        const obj = e.target.value.split(",").map((e) => e.trim())
+    const validCutoffs = (e, index) => {
+        const obj = e.target.value.split(",").map((e) => Number(e.trim()))
+        const input=prop.input.values.covariates[index]
+        const tmp=((input.range[0]*1 + input.range[1]*1) / 2).toFixed(0)
 
         if(!obj.every(function(e, i, obj) {
-            if (i) return (e > obj[i-1] && !isNaN(e) && e>=range[0] && e<=range[1])
-            else return !isNaN(e) && e>=range[0] && e<=range[1];
+
+            if (i>0) return (e > obj[i-1] && !isNaN(e) && e>=input.range[0] && e<=input.range[1])
+            else return !isNaN(e) && e>=input.range[0] && e<=input.range[1];
         })){
-            prop.input.values.covariates[index].cutoffs=''
+            prop.input.values.covariates[index].cutoffs=[tmp]
+            prop.input.values.covariates[index].keys=[input.range[0]+"-"+tmp, tmp+"-"+input.range[1]]
             prop.updateUserInput(prop.input)
 
-            alert("Input must be numeric and in the range of ["+range[0]+" , "+range[1]+"]. If they are multiple numbers, they must be monotone increasing and separated by comma.")
+            alert("Input must be numeric and in the range of ["+input.range[0]+" , "+input.range[1]+"]. If they are multiple numbers, they must be monotone increasing and separated by comma.")
         }
     }
 
@@ -54,7 +58,7 @@ function Form(prop) {
             prop.input.values.groupingVariable.label.false=''
 
             // input.values.covariates.filter(e => e.name !== value);
-            prop.input.values.covariates=[];
+            // prop.input.values.covariates=[];
 
             prop.updateGrpIndex(index)
         }
@@ -88,10 +92,12 @@ function Form(prop) {
                 obj.keys=obj.values
             }
         }
+
         if (key === 'type' || key === 'label' || key === 'unit') {
             obj[key] = value
             if (key === 'type' && value === 'bucketized'){
-                obj={...obj, unit:'1', keys:[], cutoffs:[]}
+                const tmp=((obj.range[0]*1 + obj.range[1]*1) / 2).toFixed(0)
+                obj={...obj, unit:'1', keys:[obj.range[0]+"-"+tmp, tmp+"-"+obj.range[1]], cutoffs:[tmp]}
             }
             if (key === 'type' && value === 'continous'){
                 const ind = covar.findIndex(x => x.name === obj.name);
@@ -107,7 +113,7 @@ function Form(prop) {
                         obj.keys[k]=value
                     }
                 })
-            }else{
+            }else{ // Bucketized
                 obj.keys.map((v,k)=>{
                     if (v === kv) {
                         obj.keys[k]=value
@@ -124,6 +130,11 @@ function Form(prop) {
             }else{
                 obj.keys.splice(obj.values.indexOf(value), 1)
                 obj.values.splice(obj.values.indexOf(value), 1)
+            }
+
+            if (obj.values.length === 0){
+                obj.values = prop.variables.find(x => x.name === obj.name).values
+                obj.keys = obj.values
             }
         }
 

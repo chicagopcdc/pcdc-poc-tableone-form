@@ -12,6 +12,7 @@ function Covar(prop){
     const thisCovar={...prop.covar[prop.covar.findIndex(x => x.name === prop.name)]}
 
     const ranges=[]
+
     if (prop.type==='bucketized'){
         prop.cutoffs.map((v,k)=>{
             if (k===0){
@@ -25,6 +26,8 @@ function Covar(prop){
             }
         })
     }
+
+
 
 
     return(
@@ -157,7 +160,7 @@ function Covar(prop){
                         <input
                             type="text"
                             value={prop.cutoffs}
-                            onBlur={(e)=>{prop.validCutoffs(e, prop.index,prop.range)}}
+                            onBlur={(e)=>{prop.validCutoffs(e, prop.index)}}
                             onChange={(e) =>
                                 prop.changeCoVar(e, prop.index, 'cutoffs')
                             }

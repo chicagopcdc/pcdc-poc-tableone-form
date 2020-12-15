@@ -8,7 +8,7 @@ const variables = [
         name: 'AGE',
         label: 'Age',
         isGrouping: false,
-        range: [0, 18],
+        range: [2, 19],
     },
     {
         type: 'categorical',
