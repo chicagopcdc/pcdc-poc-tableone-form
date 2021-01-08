@@ -311,6 +311,9 @@ function Form(prop) {
                 <input
                     className="input-submit btn btn-primary"
                     type="submit"
+                    onClick={
+                        prop.onSubmit                       
+                    }
                     value="Apply"
                 />
                 <br />
