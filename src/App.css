@@ -49,3 +49,10 @@ div.submit {
     display: flex;
     justify-content: center;
 }
+
+.div-table {
+    width: 800px;
+    margin: 0 1rem;
+    padding: 0px 30px 20px 30px;
+    border: 2px solid #777;
+}

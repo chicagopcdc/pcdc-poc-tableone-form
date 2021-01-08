@@ -202,14 +202,8 @@ function App() {
                 />
             </div>
 
-            <div style={{ margin: '0 1rem' }}>
-                <h1>Output</h1>
-                <pre>{JSON.stringify(userInput, null, 4)}</pre>
-                <pre>{JSON.stringify(tableData, null, 4)}</pre>
-            </div>
-
-            <div style={{ margin: '0 1rem' }}>
-                <h1>Output</h1>
+            <div className="div-table" style={{ margin: '0 1rem' }}>
+                <h1>Table</h1>
                 <Table 
                 data={tableData.data}
                 />
