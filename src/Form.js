@@ -302,7 +302,7 @@ function Form(prop) {
                 <input
                     className="input-reset btn btn-primary"
                     type="button"
-                    onClick={prop.resetForm}
+                    onClick={()=>{prop.resetForm()}}
                     value="Reset"
                 />
                 <br />
@@ -310,10 +310,8 @@ function Form(prop) {
             <div className="submit">
                 <input
                     className="input-submit btn btn-primary"
-                    type="submit"
-                    onClick={
-                        prop.onSubmit                       
-                    }
+                    type="button"
+                    onClick={()=> {prop.onSubmit()}}
                     value="Apply"
                 />
                 <br />

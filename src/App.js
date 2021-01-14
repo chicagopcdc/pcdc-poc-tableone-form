@@ -36,76 +36,8 @@ const variables = [
 
 const data = {
     "headers": {
-        "size": "Sample size (SMN)",
-        "true": "SMN Formed",
-        "false": "No SMN Formed"
     },
     "variables": [
-        {
-            "name": "Mean age at diagnosis (mo)",
-            "size": {
-                "total": 5327,
-                "true": 47
-            },
-            "pval": 0.23,
-            "keys": [
-                {
-                    "name": "",
-                    "data": {
-                        "true": 27.5,
-                        "false": 18.0
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Age at diagnosis",
-            "size": {
-                "total": 5787,
-                "true": 42
-            },
-            "pval": 0.27,
-            "keys": [
-                {
-                    "name": "< 18 mo",
-                    "data": {
-                        "true": 41.9,
-                        "false": 51.3
-                    }
-                },
-                {
-                    "name": ">= 18 mo",
-                    "data": {
-                        "true": 58.1,
-                        "false": 50.0
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Sex",
-            "size": {
-                "total": 6001,
-                "true": 51
-            },
-            "pval": 0.07,
-            "keys": [
-                {
-                    "name": "Female",
-                    "data": {
-                        "true": 62.8,
-                        "false": 46.6
-                    }
-                },
-                {
-                    "name": "Male",
-                    "data": {
-                        "true": 37.2,
-                        "false": 53.4
-                    }
-                }
-            ]
-        }
     ]
 }
 
@@ -151,22 +83,17 @@ function App() {
         setUserInput(initialState)
     }
 
-    const [isInputChanged, setIsInputChanged] = useState(false)
-    useEffect(() => {
-      setIsInputChanged(true)
-    }, [userInput])
-
 
     const url="http://localhost:5000"
 
     const handleSubmit = (requestBody) => {  
+        console.log("aaa")
         fetch(url, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
             },
-            //body: JSON.stringify("test"),
             body: JSON.stringify(requestBody),
           })
             .then((response) => {
@@ -176,16 +103,10 @@ function App() {
             .then((result) => {
                 setTableData({data : result})
               })
-            .catch((e) => console.error(e))
+           
+            
     }
-
-
-
    
-    // useEffect(() => {
-    //     console.log("useEffect")
-    //     console.log(userInput)
-    // }, [userInput]);
 
     return (
         <div className="div-container m-3">
@@ -198,7 +119,7 @@ function App() {
                     resetForm={resetForm}
                     updateUserInput={updateUserInput}
                     updateGrpIndex={updateGrpIndex}
-                    onSubmit={handleSubmit(userInput)}
+                    onSubmit={() => handleSubmit(userInput)}
                 />
             </div>
 

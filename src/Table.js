@@ -1,11 +1,12 @@
 import React from 'react';
-//import data from './data';
 
 export default function DenseTable(prop) {
     const data = prop.data
 
 
     let header=data.headers;
+    header.pvalue = header.size ? "P-value" : "" 
+
     let rows=[];
     data.variables.map((v,k)=>{
         let row={};
@@ -48,7 +49,7 @@ export default function DenseTable(prop) {
               <th scope="col">{header.size}</th>
               <th scope="col">{header.true}</th>
               <th scope="col">{header.false}</th>
-              <th scope="col">P-value</th>
+              <th scope="col">{header.pvalue}</th>
           </tr>
           </thead>
           <tbody>
