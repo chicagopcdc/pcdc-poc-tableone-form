@@ -56,8 +56,8 @@ function App() {
                     operator: 'eq',
                 },
                 label: {
-                    true: '',
-                    false: '',
+                    true: "True",
+                    false: "False",
                 },
             },
             covariates: []
@@ -84,7 +84,7 @@ function App() {
     }
 
 
-    const url="http://localhost:5000"
+    const url="http://127.0.0.1:5000"
 
     const handleSubmit = (requestBody) => {  
         console.log("aaa")
