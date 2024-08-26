@@ -1,7 +1,22 @@
-import React from 'react'
+import React, { useState} from 'react'
+import Select from 'react-select'
 import Covar from './Covar'
+import './Form.css'
+import Button from './gen3-ui-component/components/Button';
+
 
 function Form(prop) {
+
+    const [groupName, setGroupName] = useState({value:prop.variables[prop.gid].name,
+                                                label:prop.variables[prop.gid].name });
+    const [trueIf, setTrueIf] = useState({value:prop.input.values.groupingVariable.trueIf.operator,
+                                            label:prop.input.values.groupingVariable.trueIf.operator });
+    // const [selectValue, setSelectValue] = useState({
+    //     value : prop.variables[prop.gid].type === 'categorical'? prop.variables[prop.gid].values[0] : prop.variables[prop.gid].range[0],
+    //     label : prop.variables[prop.gid].type === 'categorical'? prop.variables[prop.gid].values[0] : prop.variables[prop.gid].range[0]
+    // })
+    const [selectValue, setSelectValue] = useState([])
+
     const operator=[
         {key:"eq", name:"Equal to"},
         {key:"gt", name:"Greater than"},
@@ -13,7 +28,7 @@ function Form(prop) {
 
     // const covar = JSON.parse(JSON.stringify(prop.variables))
     // covar.splice(prop.gid, 1)
-    const covar = prop.variables.filter(item => item.isGrouping === false)
+    const covar = prop.variables
 
 
     const validCutoffs = (e, index) => {
@@ -46,25 +61,45 @@ function Form(prop) {
     }
 
     const changeGrpVar = (e, key) => {
-        const value = e.target.value
+        const value = e.value
+        console.log(e)
 
         if (key === 'name') {
             const index = prop.variables.findIndex(e => e.name === value);
+            prop.updateGrpIndex(index)
 
+            const newgroup = prop.variables[index]
+            console.log(e)
+            setGroupName({value:value,
+                            label:value })
             prop.input.values.groupingVariable.name = value
             prop.input.values.groupingVariable.trueIf.operator='eq'
-            prop.input.values.groupingVariable.trueIf.value=''
-            prop.input.values.groupingVariable.label.true=''
-            prop.input.values.groupingVariable.label.false=''
-
-            // input.values.covariates.filter(e => e.name !== value);
-            // prop.input.values.covariates=[];
-
-            prop.updateGrpIndex(index)
+            prop.input.values.groupingVariable.trueIf.value = newgroup.type==="categorical" ? '\''+newgroup.values[0]+'\'':newgroup.range[0]
+            prop.input.values.groupingVariable.label.true='True'
+            prop.input.values.groupingVariable.label.false='False'
+            prop.input.values.groupingVariable.values = newgroup.values
+            console.log( prop.input.values.groupingVariable)
         }
 
         if (key === 'operator' || key === 'value') {
-            prop.input.values.groupingVariable.trueIf[key] = value
+            if(prop.input.values.groupingVariable.type === 'categorical'){
+                console.log(e)
+                prop.input.values.groupingVariable.trueIf['operator'] = 'eq'
+                prop.input.values.groupingVariable.trueIf['value'] = e
+            }
+            else
+                prop.input.values.groupingVariable.trueIf[key] = value
+
+            if(key === 'operator'){
+                setTrueIf({
+                    value: prop.input.values.groupingVariable.trueIf['operator'],
+                    label: prop.input.values.groupingVariable.trueIf['operator']
+                })
+            }
+            else{
+                console.log(e)
+                setSelectValue(e)
+            }
         }
         if (key === 'true' || key === 'false') {
             prop.input.values.groupingVariable.label[key] = value
@@ -79,7 +114,7 @@ function Form(prop) {
 
         let obj = JSON.parse(JSON.stringify(prop.input.values.covariates[index]))
         const value = e.target.value
-
+        console.log(obj)
 
         if (key === 'name') {
             const ind = covar.findIndex(x => x.name === value);
@@ -96,6 +131,7 @@ function Form(prop) {
         if (key === 'type' || key === 'label' || key === 'unit') {
             obj[key] = value
             if (key === 'type' && value === 'bucketized'){
+                console.log(obj)
                 const tmp=((obj.range[0]*1 + obj.range[1]*1) / 2).toFixed(0)
                 obj={...obj, unit:'1', keys:[obj.range[0]+"-"+tmp, tmp+"-"+obj.range[1]], cutoffs:[tmp]}
             }
@@ -169,6 +205,8 @@ function Form(prop) {
 
     const addCoVar = () => {
         const obj = covar[0]
+        console.log(covar)
+        console.log(obj)
 
         if (obj.type==="continous"){
             obj.unit=1
@@ -179,108 +217,129 @@ function Form(prop) {
         }
 
         prop.input.values.covariates.push(obj)
+        console.log(prop.input.values.covariates)
 
         prop.updateUserInput(prop.input)
     }
 
 
-    const submitForm = (event) => {
-        // event.preventDefault()
-        // console.log(this.state.values)
+    const groupRender = () =>{
+        if(prop.variables[prop.gid].type !== "continuous"){
+            return(<div>
+                    <div className='names'>
+                        <label className='tip-lables-name'>True if...</label>
+                            <Select
+                                isMulti
+                                className='name-select'
+                                value={selectValue}
+                                onChange={(e) => changeGrpVar(e, 'value')}
+                                placeholder="True if..."
+                                options = { prop.variables[prop.gid].values.map((v, k) => ({
+                                    value: v,  
+                                    label: v,
+                                }))}
+                            ></Select>
+                    </div>
+                   {selectValue.map((e)=>{
+                        return  <div  className='names'>
+                        <label className='tip-lables-bool'>{e.value} label:</label>
+                            <input
+                                className='input-styled'
+                                type="text"
+                                value={e.value}
+                                onChange={(e) => changeGrpVar(e, 'true')}
+                            />
+            
+                        </div>
+                   })}
+                    </div>
+            )
+        }
+       else return (
+        <div className='names'>
+            <label className='tip-lables'>True if...</label>
+            <Select
+                className='name-select'
+                value={trueIf}
+                onChange={(e) => changeGrpVar(e, 'operator')}
+                placeholder="True if..."
+                options = { operator.map((e) => ({
+                    value: e.name,  
+                    label: e.name,
+                }))}
+            >
+            </Select>
+            <label className='tip-lables-value'>Value</label>
+            <Select
+                className='name-select'
+                value={selectValue}
+                onChange={(e) => changeGrpVar(e, 'value')}
+                placeholder="Value"
+                options = { prop.variables[prop.gid].type === 'categorical' ?prop.variables[prop.gid].values.map((v, k) => ({
+                    value: v,  
+                    label: v,
+                })):prop.variables[prop.gid].range.map((v, k) => ({
+                    value: v,  
+                    label: v,
+                }))}
+            >
+            </Select>
+           </div>
+       )
     }
 
     return (
-        <div>
+        <div className='form-container'>
             <h2>Grouping variable</h2>
-            <label>
-                name:
-                <select
-                    value={prop.variables[prop.gid].name}
-                    onChange={(e) => changeGrpVar(e, 'name')}
-                >
-                    {
-                        prop.allGrpIndex.map((i,k)=>{
-                            return(
-                                <option key={k.toString()} value={prop.variables[i].name}>{prop.variables[i].name}</option>
-                            )
-                        })
-                    }
-                </select>
-            </label>
-            <label>
-                True if:
-                <select
-                    value={prop.input.values.groupingVariable.trueIf.operator}
-                    onChange={(e) =>
-                        changeGrpVar(e, 'operator')
-                    }
-                >
-                    {
-                        operator.map((e,k)=>{
-                            return(
-                                <option key={k.toString()} value={e.key} disabled={prop.variables[prop.gid].type!=="continuous" && e.key!=="eq"}>{e.name}</option>
-                            )
-                        })
-                    }
-                </select>
-            </label>
-            <label>
-                Value:
-                {prop.variables[prop.gid].type==="continuous" ?(
-                <input
-                    type="text"
-                    value={prop.input.values.groupingVariable.trueIf.value}
-                    onBlur={(e)=>{validGrpValue(e,prop.variables[prop.gid].range)}}
-                    onChange={(e) =>
-                        changeGrpVar(e, 'value')
-                    }
-                />
-                ):(
-                    <select
-                        value={prop.input.values.groupingVariable.trueIf.value}
-                        onChange={(e) =>
-                            changeGrpVar(e, 'value')
-                        }
+            <div className='names'>
+                <label className='tip-lables-name'>Name</label>
+                    <Select
+                        className='name-select'
+                        value={groupName}
+                        onChange={(e) => changeGrpVar(e, 'name')}
+                        placeholder="Name"
+                        options = { prop.allGrpIndex.map((i)=>{
+                            return {
+                                value: prop.variables[i].name,                
+                                label: prop.variables[i].name
+                            };
+                        })}
                     >
-                        {
-                            prop.variables[prop.gid].values.map((v, k)=>{
-                                return(
-                                    <option key={k.toString()} value={v}>{v}</option>
-                                )
-                            })
-                        }
-                    </select>
-                )}
-            </label>
-            <label>
-                "True" group label:
+                    </Select>
+            </div>
+
+            {groupRender()}           
+            
+            {/* <div  className='names'>
+            <label className='tip-lables-bool'>"True" group label:</label>
                 <input
+                    className='input-styled'
                     type="text"
                     value={prop.input.values.groupingVariable.label.true}
                     onChange={(e) => changeGrpVar(e, 'true')}
                 />
-            </label>
-            <label>
-                "False" group label:
-                <input
-                    type="text"
-                    value={prop.input.values.groupingVariable.label.false}
-                    onChange={(e) =>
-                        changeGrpVar(e, 'false')
-                    }
-                />
-            </label>
 
+            </div>
+            
+            <div  className='names'>
+            <label className='tip-lables-bool'>"False" group label:</label>
+                <input
+                    className='input-styled'
+                    type="text"
+                    value={prop.input.values.groupingVariable.label.true}
+                    onChange={(e) => changeGrpVar(e, 'false')}
+                />
+
+            </div> */}
 
             <div style={{ margin: '20px 0' }}>
                 <h2 style={{ display: 'inline' }}>Covariate</h2>{' '}
-                <button
-                    className="btn btn-primary"
-                    style={{ float: 'right' }}
+                <Button
+                    buttonType = 'default'
+                    label='Add Variable'
                     onClick={addCoVar}
-                >
-                    Add variable
-                </button>
+                />
+
             </div>
 
             {prop.input.values.covariates && prop.input.values.covariates.map((e, index) => {
@@ -298,23 +357,21 @@ function Form(prop) {
                     />
                 )
             })}
-            <div className="reset">
-                <input
+
+            <div  className='names'>
+            <input
                     className="input-reset btn btn-primary"
+                    style={{marginRight:'10px'}}
                     type="button"
                     onClick={()=>{prop.resetForm()}}
                     value="Reset"
                 />
-                <br />
-            </div>
-            <div className="submit">
-                <input
+                 <input
                     className="input-submit btn btn-primary"
                     type="button"
                     onClick={()=> {prop.onSubmit()}}
                     value="Apply"
                 />
-                <br />
             </div>
         </div>
     )

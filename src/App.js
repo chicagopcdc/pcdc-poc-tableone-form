@@ -5,38 +5,60 @@ import Table from './Table';
 
 const variables = [
     {
-        type: 'continuous',
-        name: 'AGE',
-        label: 'Age',
-        isGrouping: false,
-        range: [2, 19],
+        type: 'categorical',
+        name: 'sex',
+        label: 'sex',
+        isGrouping: true,
+        values: ['Male', 'Undifferentiated', 'Female', 'Other', 'Unknown', 'Not Reported'],
     },
     {
         type: 'categorical',
-        name: 'SEX',
-        label: 'Sex',
-        isGrouping: false,
-        values: ['female', 'male'],
-    },
-    {
-        type: 'continuous',
-        name: 'WEIGHT',
-        label: 'Weight',
+        name: 'ethnicity',
+        label: 'ethnicity',
         isGrouping: true,
-        range: [60, 200]
+        values: ['Not Hispanic or Latino', 'Not Reported', 'Hispanic or Latino', 'Unknown'],
     },
     {
         type: 'categorical',
-        name: 'SMN',
-        label: 'SMN',
+        name: 'race',
+        label: 'race',
         isGrouping: true,
-        values: [0, 1],
+        values: ['Black or African American', 'Asian', 'White', 'Native Hawaiian or Other Pacific Islander', 'American Indian or Alaska Native', 'Not Reported', 'Multiracial', 'Unknown', 'Other'],
+    },
+    {
+        type: 'continuous',
+        name: 'age_at_lkss',
+        label: 'age_at_lkss',
+        isGrouping: true,
+        range: [0, 99],
+    },
+    {
+        type: 'categorical',
+        name: 'lkss',
+        label: 'lkss',
+        isGrouping: true,
+        values: ['Alive', 'Dead', 'Unknown'],
+    },
+    {
+        type: 'continuous',
+        name: 'age_at_smn',
+        label: 'age_at_smn',
+        isGrouping: false,
+        range: [0, 99],
+    },
+    {
+        type: 'categorical',
+        name: 'smn site',
+        label: 'smn_site',
+        isGrouping: true,
+        values: ['Head and Neck', 'Not Reported', 'Thorax', 'Unknown', 'Abdomen', 'Pelvis', 'CNS', 'Limbs', 'Other', 'Not Applicable'],
     }
 ]
 
 const data = {
-    "headers": {
-    },
+    "headers": [
+
+    ],
     "variables": [
     ]
 }
@@ -52,7 +74,7 @@ function App() {
                 type: variables[grpIndex].type,
                 values: variables[grpIndex].type==="categorical" ? variables[grpIndex].values:variables[grpIndex].range,
                 trueIf: {
-                    value: variables[grpIndex].type==="categorical" ? variables[grpIndex].values[0]:'',
+                    value: variables[grpIndex].type==="categorical" ? [{value: variables[grpIndex].values[0]}]:'',
                     operator: 'eq',
                 },
                 label: {
@@ -88,6 +110,7 @@ function App() {
 
     const handleSubmit = (requestBody) => {  
         console.log("aaa")
+        console.log(requestBody)
         fetch(url, {
             method: 'POST',
             headers: {
@@ -102,9 +125,7 @@ function App() {
             })
             .then((result) => {
                 setTableData({data : result})
-              })
-           
-            
+              })           
     }
    
 
@@ -124,7 +145,7 @@ function App() {
             </div>
 
             <div className="div-table" style={{ margin: '0 1rem' }}>
-                <h1>Table</h1>
+                <h2>Table</h2>
                 <Table 
                 data={tableData.data}
                 />

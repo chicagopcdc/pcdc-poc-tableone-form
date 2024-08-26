@@ -1,8 +1,8 @@
-input {
+/* input {
     display: inline-block;
     margin: 5px 20px;
     /*width: 200px;*/
-}
+/* } */
 
 select {
     display: inline-block;
@@ -13,7 +13,7 @@ select {
 label {
     margin: 5px 20px;
     width: 200px;
-}
+} */
 
 div.reset,
 div.submit {
@@ -23,25 +23,12 @@ div.submit {
     align-items: center;
 }
 
-/*.input-reset {*/
-/*    width: 200px;*/
-/*    height: 40px;*/
-/*    background-color: white;*/
-/*    margin: 5px;*/
-/*}*/
-
-/*.input-submit {*/
-/*    width: 200px;*/
-/*    height: 40px;*/
-/*    background-color: yellow;*/
-/*    margin: 5px;*/
-/*}*/
-
 .div-form {
     width: 500px;
     margin: 0 1rem;
-    padding: 0px 30px 20px 30px;
+    padding: 15px 20px 15px 20px;
     border: 2px solid #777;
+    border-radius: 10px;
 }
 
 .div-container {
@@ -53,6 +40,6 @@ div.submit {
 .div-table {
     width: 800px;
     margin: 0 1rem;
-    padding: 0px 30px 20px 30px;
+    padding: 15px 30px 20px 30px;
     border: 2px solid #777;
 }
